@@ -14,7 +14,7 @@ pkg install git
 
 termux-setup-storage
 
-https://github.com/whizzy28639/T-G-ban.git
+git clone https://github.com/whizzy28639/T-G-ban.git
 
 cd T-G-ban.git
 
