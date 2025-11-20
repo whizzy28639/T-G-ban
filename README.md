@@ -16,7 +16,7 @@ termux-setup-storage
 
 git clone https://github.com/whizzy28639/T-G-ban.git
 
-cd T-G-ban.git
+cd T-G-ban
 
 chmod +x *
 
