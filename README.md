@@ -14,10 +14,10 @@ pkg install git
 
 termux-setup-storage
 
-git clone https://github.com/redx645/REDX_64.git
+https://github.com/whizzy28639/T-G-ban.git
 
-cd REDX_64
+cd T-G-ban.git
 
 chmod +x *
 
-python3 REDX_64.py
+python3 T-G-ban.py
