@@ -1,4 +1,4 @@
-name: Build Linux binary
+name: Build & Replace (PyInstaller)  # builds binary and replaces .py on main
 
 on:
   push:
@@ -6,10 +6,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build_and_replace:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout (with write permissions)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true  # allow pushing with GITHUB_TOKEN
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -26,8 +30,32 @@ jobs:
           pyinstaller --onefile T-G-ban.py
           ls -l dist
 
-      - name: Upload binary artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: t-g-ban-binary
-          path: dist/T-G-ban
+      - name: Move binary into repo root
+        run: |
+          # create a clean name for the binary
+          mkdir -p build_out
+          cp dist/T-G-ban build_out/T-G-ban
+          chmod +x build_out/T-G-ban
+          ls -l build_out
+
+      - name: Replace source with binary and commit
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # configure git
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+          # move the new binary into repo root
+          mv build_out/T-G-ban T-G-ban
+
+          # remove the python source (backup it somewhere else first if you want)
+          git rm --ignore-unmatch T-G-ban.py || true
+
+          # add the binary
+          git add T-G-ban
+
+          # commit and push
+          git commit -m "ci: add protected binary (built by Actions) and remove source" || echo "nothing to commit"
+          git push origin HEAD:main
